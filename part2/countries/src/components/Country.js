@@ -2,7 +2,7 @@ import React from "react";
 
 const Country = ({ country }) => {
 	return (
-		<div>
+		<>
 			<h1>{country.name}</h1>
 			<p>capital: {country.capital}</p>
 			<p>population: {country.population}</p>
@@ -13,7 +13,7 @@ const Country = ({ country }) => {
 				))}
 			</ul>
 			<img src={country.flag} alt="country flag" width="120" height="120" />
-		</div>
+		</>
 	);
 };
 
