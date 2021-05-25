@@ -7,7 +7,7 @@ import Country from "./components/Country";
 function App() {
 	const [countries, setCountries] = useState([]);
 	const [filterCountry, setFilterCountry] = useState("");
-	const [showCountry, setShowCountry] = useState({});
+	const [showCountry, setShowCountry] = useState(false);
 
 	useEffect(() => {
 		axios.get("https://restcountries.eu/rest/v2/all").then((response) => {
@@ -22,6 +22,7 @@ function App() {
 
 	const handleFilterChange = (event) => {
 		setFilterCountry(event.target.value);
+		setShowCountry(true);
 	};
 	return (
 		<div>
