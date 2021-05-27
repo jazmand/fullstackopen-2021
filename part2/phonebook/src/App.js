@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Filter from "./components/Filter";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
+import personService from "./services/persons";
 
 const App = () => {
 	const [persons, setPersons] = useState([]);
@@ -12,12 +12,19 @@ const App = () => {
 
 	useEffect(() => {
 		console.log("effect");
-		axios.get("http://localhost:3001/persons").then((response) => {
+		personService.getAll().then((initialPersons) => {
 			console.log("promise fulfilled");
-			setPersons(response.data);
+			setPersons(initialPersons);
 		});
 	}, []);
 	console.log("render", persons.length, "persons");
+
+	const deletePerson = (id) => {
+		personService.deleteRequest(id).then(() => {
+			setPersons(persons.filter((person) => person.id !== id));
+			console.log("delete success", persons);
+		});
+	};
 
 	const addPerson = (event) => {
 		event.preventDefault();
@@ -25,13 +32,15 @@ const App = () => {
 			name: newName,
 			number: newNumber,
 		};
-		if (persons.some((person) => person.name === newName)) {
-			alert(`${newName} is already added to phonebook`);
-		} else {
-			setPersons(persons.concat(personObject));
-			setNewName("");
-			setNewNumber("");
-		}
+		personService.create(personObject).then((returnedPerson) => {
+			if (persons.some((person) => person.name === newName)) {
+				alert(`${newName} is already added to phonebook`);
+			} else {
+				setPersons(persons.concat(returnedPerson));
+				setNewName("");
+				setNewNumber("");
+			}
+		});
 	};
 
 	const handleNameChange = (event) => {
@@ -61,7 +70,11 @@ const App = () => {
 				handleNumberChange={handleNumberChange}
 			/>
 			<h2>Numbers</h2>
-			<Persons persons={persons} filterName={filterName} />
+			<Persons
+				deletePerson={deletePerson}
+				persons={persons}
+				filterName={filterName}
+			/>
 		</div>
 	);
 };

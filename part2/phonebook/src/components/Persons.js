@@ -1,7 +1,6 @@
 import React from "react";
-import Person from "./Person";
 
-const Persons = ({ persons, filterName }) => {
+const Persons = ({ persons, filterName, deletePerson }) => {
 	return (
 		<div>
 			{persons
@@ -9,7 +8,18 @@ const Persons = ({ persons, filterName }) => {
 					person.name.toLowerCase().includes(filterName.toLowerCase())
 				)
 				.map((person) => (
-					<Person key={person.name} person={person} />
+					<p key={person.id}>
+						{person.name} {person.number}
+						<button
+							onClick={() =>
+								window.confirm(`Delete ${person.name}?`)
+									? deletePerson(person.id)
+									: console.log("delete cancelled")
+							}
+						>
+							delete
+						</button>
+					</p>
 				))}
 		</div>
 	);
