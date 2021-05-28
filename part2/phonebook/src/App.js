@@ -26,21 +26,40 @@ const App = () => {
 		});
 	};
 
+	const updateNumber = (id, newObject) => {
+		personService.update(id, newObject).then(() => {
+			personService.getAll().then((updatedPersons) => {
+				console.log("update fulfilled");
+				setPersons(updatedPersons);
+				setNewName("");
+				setNewNumber("");
+			});
+		});
+	};
+
 	const addPerson = (event) => {
 		event.preventDefault();
 		const personObject = {
 			name: newName,
 			number: newNumber,
 		};
-		personService.create(personObject).then((returnedPerson) => {
-			if (persons.some((person) => person.name === newName)) {
-				alert(`${newName} is already added to phonebook`);
-			} else {
+
+		if (persons.some((person) => person.name === newName)) {
+			window.confirm(
+				`${newName} is already added to phonebook, replace the old number with a new one?`
+			)
+				? persons.map(
+						(person) =>
+							person.name === newName && updateNumber(person.id, personObject)
+				  )
+				: console.log("update cancelled");
+		} else {
+			personService.create(personObject).then((returnedPerson) => {
 				setPersons(persons.concat(returnedPerson));
 				setNewName("");
 				setNewNumber("");
-			}
-		});
+			});
+		}
 	};
 
 	const handleNameChange = (event) => {
