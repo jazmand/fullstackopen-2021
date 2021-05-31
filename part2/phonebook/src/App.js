@@ -3,12 +3,15 @@ import Filter from "./components/Filter";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import personService from "./services/persons";
+import Notification from "./components/Notification";
+import "./index.css";
 
 const App = () => {
 	const [persons, setPersons] = useState([]);
 	const [newName, setNewName] = useState("");
 	const [newNumber, setNewNumber] = useState("");
 	const [filterName, setFilterName] = useState("");
+	const [message, setMessage] = useState(null);
 
 	useEffect(() => {
 		console.log("effect");
@@ -20,16 +23,41 @@ const App = () => {
 	console.log("render", persons.length, "persons");
 
 	const deletePerson = (id) => {
-		personService.deleteRequest(id).then(() => {
-			setPersons(persons.filter((person) => person.id !== id));
-			console.log("delete success", persons);
-		});
+		const person = persons.find((n) => n.id === id);
+		personService
+			.deleteRequest(id)
+			.then(() => {
+				setPersons(persons.filter((person) => person.id !== id));
+				setMessage({
+					text: `${person.name} removed from server`,
+					type: "fulfilled",
+				});
+				setTimeout(() => {
+					setMessage(null);
+				}, 4000);
+			})
+			.catch(() => {
+				setMessage({
+					text: `Information of ${person.name} already removed from server`,
+					type: "error",
+				});
+				setTimeout(() => {
+					setMessage(null);
+				}, 4000);
+			});
 	};
 
 	const updateNumber = (id, newObject) => {
 		personService.update(id, newObject).then(() => {
 			personService.getAll().then((updatedPersons) => {
 				console.log("update fulfilled");
+				setMessage({
+					text: "phone number updated",
+					type: "fulfilled",
+				});
+				setTimeout(() => {
+					setMessage(null);
+				}, 4000);
 				setPersons(updatedPersons);
 				setNewName("");
 				setNewNumber("");
@@ -55,6 +83,13 @@ const App = () => {
 				: console.log("update cancelled");
 		} else {
 			personService.create(personObject).then((returnedPerson) => {
+				setMessage({
+					text: `Added ${newName}`,
+					type: "fulfilled",
+				});
+				setTimeout(() => {
+					setMessage(null);
+				}, 4000);
 				setPersons(persons.concat(returnedPerson));
 				setNewName("");
 				setNewNumber("");
@@ -79,6 +114,7 @@ const App = () => {
 	return (
 		<div>
 			<h2>Phonebook</h2>
+			<Notification message={message} />
 			<Filter filterName={filterName} handleFilterChange={handleFilterChange} />
 			<h2>add a new</h2>
 			<PersonForm
