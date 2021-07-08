@@ -6,9 +6,7 @@
 	"scripts": {
 		"start": "node index.js",
 		"dev": "nodemon index.js",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"deploy": "git subtree push --prefix part3/phonebook heroku master",
-		"logs:prod": "heroku logs --tail"
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"proxy": "http://localhost:3001",
 	"author": "Matti Luukkainen",
