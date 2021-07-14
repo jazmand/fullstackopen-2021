@@ -49,19 +49,30 @@ const App = () => {
 
 	const updateNumber = (id, newObject) => {
 		personService.update(id, newObject).then(() => {
-			personService.getAll().then((updatedPersons) => {
-				console.log("update fulfilled");
-				setMessage({
-					text: "phone number updated",
-					type: "fulfilled",
+			personService
+				.getAll()
+				.then((updatedPersons) => {
+					setPersons(updatedPersons);
+					console.log("update fulfilled");
+					setMessage({
+						text: "phone number updated",
+						type: "fulfilled",
+					});
+					setTimeout(() => {
+						setMessage(null);
+					}, 4000);
+				})
+				.catch((error) => {
+					setMessage({
+						text: error.response.data.error,
+						type: "error",
+					});
+					setTimeout(() => {
+						setMessage(null);
+					}, 4000);
 				});
-				setTimeout(() => {
-					setMessage(null);
-				}, 4000);
-				setPersons(updatedPersons);
-				setNewName("");
-				setNewNumber("");
-			});
+			setNewName("");
+			setNewNumber("");
 		});
 	};
 
@@ -82,18 +93,29 @@ const App = () => {
 				  )
 				: console.log("update cancelled");
 		} else {
-			personService.create(personObject).then((returnedPerson) => {
-				setMessage({
-					text: `Added ${newName}`,
-					type: "fulfilled",
+			personService
+				.create(personObject)
+				.then((returnedPerson) => {
+					setMessage({
+						text: `Added ${newName}`,
+						type: "fulfilled",
+					});
+					setTimeout(() => {
+						setMessage(null);
+					}, 4000);
+					setPersons(persons.concat(returnedPerson));
+				})
+				.catch((error) => {
+					setMessage({
+						text: error.response.data.error,
+						type: "error",
+					});
+					setTimeout(() => {
+						setMessage(null);
+					}, 4000);
 				});
-				setTimeout(() => {
-					setMessage(null);
-				}, 4000);
-				setPersons(persons.concat(returnedPerson));
-				setNewName("");
-				setNewNumber("");
-			});
+			setNewName("");
+			setNewNumber("");
 		}
 	};
 
