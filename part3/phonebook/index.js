@@ -8,31 +8,31 @@ const Person = require('./models/person')
 app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
-morgan.token('body', (req, res) => JSON.stringify(req.body))
+morgan.token('body', (request, response) => JSON.stringify(request.body))
 app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 )
 
 app.get('/api/persons', (request, response) => {
-  Person.find({}).then((persons) => {
+  Person.find({}).then(persons => {
     response.json(persons)
   })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
-    .then((person) => {
+    .then(person => {
       if (person) {
         response.json(person)
       } else {
         response.status(404).end()
       }
     })
-    .catch((error) => next(error))
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
-  const people = persons.length
+  const people = Person.length
   const today = new Date()
   const options = {
     weekday: 'short',
@@ -51,7 +51,7 @@ app.get('/info', (request, response) => {
   function getTimeZoneName(today, locales, type) {
     return new Intl.DateTimeFormat(locales, { timeZoneName: type })
       .formatToParts(today)
-      .find((part) => part.type == 'timeZoneName').value
+      .find(part => part.type === 'timeZoneName').value
   }
   const timezone = getTimeZoneName(today, [], 'long')
   response.send(
@@ -70,18 +70,18 @@ app.put('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndUpdate(request.params.id, person, {
     new: true,
   })
-    .then((updatedPerson) => {
+    .then(updatedPerson => {
       response.json(updatedPerson)
     })
-    .catch((error) => next(error))
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then((result) => {
+    .then(result => {
       response.status(204).end()
     })
-    .catch((error) => next(error))
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response, next) => {
@@ -103,11 +103,11 @@ app.post('/api/persons', (request, response, next) => {
   })
   person
     .save()
-    .then((savedNote) => savedNote.toJSON())
-    .then((savedAndFormattedPerson) => {
+    .then(savedNote => savedNote.toJSON())
+    .then(savedAndFormattedPerson => {
       response.json(savedAndFormattedPerson)
     })
-    .catch((error) => next(error))
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
