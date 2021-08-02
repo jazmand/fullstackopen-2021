@@ -9,11 +9,16 @@
 		"express": "^4.17.1",
 		"mongoose": "^5.13.3"
 	},
-	"devDependencies": {},
+	"devDependencies": {
+		"jest": "^27.0.6"
+	},
 	"scripts": {
 		"start": "node index.js",
 		"dev": "nodemon index.js",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "jest --verbose"
+	},
+	"jest": {
+		"testEnvironment": "node"
 	},
 	"author": "",
 	"license": "MIT"
