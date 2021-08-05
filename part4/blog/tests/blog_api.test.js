@@ -8,11 +8,13 @@ const initialBlogs = [
 		title: 'First blog post',
 		author: 'Judi',
 		url: 'www.blog.com',
+		likes: 2,
 	},
 	{
 		title: 'Second blog post',
 		author: 'Yukiko',
 		url: 'www.secondblog.com',
+		likes: 4,
 	},
 ];
 beforeEach(async () => {
