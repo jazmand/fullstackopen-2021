@@ -67,6 +67,18 @@ test('a valid blog can be added', async () => {
 	expect(titles).toContain('Third blog post');
 });
 
+test('when title and/or url properties are missing status code 400 is returned', async () => {
+	const newBlog = {
+		title: 'Third blog post',
+	};
+
+	await api.post('/api/blogs').send(newBlog).expect(400);
+
+	const response = await api.get('/api/blogs');
+
+	expect(response.body).toHaveLength(initialBlogs.length);
+});
+
 afterAll(() => {
 	mongoose.connection.close();
 });
