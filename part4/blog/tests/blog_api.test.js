@@ -38,6 +38,13 @@ test('a specific blog is within the returned blogs', async () => {
 	expect(titles).toContain('Second blog post');
 });
 
+test('unique identifier property of the blog posts is named id', async () => {
+	const response = await api.get('/api/blogs');
+
+	const doesIdExist = response.body.every((r) => r.id) ? true : undefined;
+	expect(doesIdExist).toBeDefined();
+});
+
 afterAll(() => {
 	mongoose.connection.close();
 });
