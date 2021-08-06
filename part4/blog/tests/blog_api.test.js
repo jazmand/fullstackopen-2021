@@ -104,7 +104,7 @@ test('a blog can be deleted', async () => {
 	const titles = blogsAtEnd.map((r) => r.title);
 
 	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
-	expect(titles).not.toContain('Go To Statement Considered Harmful');
+	expect(titles).not.toContain(blogToDelete.title);
 });
 
 afterAll(() => {
