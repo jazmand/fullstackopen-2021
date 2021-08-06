@@ -67,6 +67,24 @@ test('a valid blog can be added', async () => {
 	expect(titles).toContain('Third blog post');
 });
 
+test('blog without likes property will default to the value 0', async () => {
+	const newBlog = {
+		title: 'Third blog post',
+		author: 'Crystal',
+		url: 'www.thirdblog.com',
+	};
+
+	await api.post('/api/blogs').send(newBlog).expect(201);
+
+	const response = await api.get('/api/blogs');
+	const blogIndex = response.body.length - 1;
+	const isLikesZero = response.body[blogIndex].likes;
+	console.log(isLikesZero);
+
+	expect(response.body).toHaveLength(initialBlogs.length + 1);
+	expect(isLikesZero).toBe(0);
+});
+
 test('when title and/or url properties are missing status code 400 is returned', async () => {
 	const newBlog = {
 		title: 'Third blog post',
