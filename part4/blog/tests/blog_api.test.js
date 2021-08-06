@@ -1,41 +1,37 @@
-const mongoose = require('mongoose');
 const supertest = require('supertest');
+const mongoose = require('mongoose');
+const helper = require('./test_helper');
 const app = require('../app');
 const api = supertest(app);
+
 const Blog = require('../models/blog');
-const initialBlogs = [
-	{
-		title: 'First blog post',
-		author: 'Judi',
-		url: 'www.blog.com',
-		likes: 2,
-	},
-	{
-		title: 'Second blog post',
-		author: 'Yukiko',
-		url: 'www.secondblog.com',
-		likes: 4,
-	},
-];
+
 beforeEach(async () => {
 	await Blog.deleteMany({});
-	let blogObject = new Blog(initialBlogs[0]);
+	let blogObject = new Blog(helper.initialBlogs[0]);
 	await blogObject.save();
-	blogObject = new Blog(initialBlogs[1]);
+	blogObject = new Blog(helper.initialBlogs[1]);
 	await blogObject.save();
 });
 
-test('all blogs are returned as json', async () => {
+test('blogs are returned as json', async () => {
+	await api
+		.get('/api/blogs')
+		.expect(200)
+		.expect('Content-Type', /application\/json/);
+});
+
+test('all blogs are returned', async () => {
 	const response = await api.get('/api/blogs');
 
-	expect(response.body).toHaveLength(initialBlogs.length);
+	expect(response.body).toHaveLength(helper.initialBlogs.length);
 });
 
 test('a specific blog is within the returned blogs', async () => {
 	const response = await api.get('/api/blogs');
 
 	const titles = response.body.map((r) => r.title);
-	expect(titles).toContain('Second blog post');
+	expect(titles).toContain('React patterns');
 });
 
 test('unique identifier property of the blog posts is named id', async () => {
@@ -47,10 +43,10 @@ test('unique identifier property of the blog posts is named id', async () => {
 
 test('a valid blog can be added', async () => {
 	const newBlog = {
-		title: 'Third blog post',
-		author: 'Crystal',
-		url: 'www.thirdblog.com',
-		likes: 6,
+		title: 'First class tests',
+		author: 'Robert C. Martin',
+		url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+		likes: 10,
 	};
 
 	await api
@@ -59,19 +55,19 @@ test('a valid blog can be added', async () => {
 		.expect(201)
 		.expect('Content-Type', /application\/json/);
 
-	const response = await api.get('/api/blogs');
+	const blogsAtEnd = await helper.blogsInDb();
 
-	const titles = response.body.map((r) => r.title);
+	const titles = blogsAtEnd.map((r) => r.title);
 
-	expect(response.body).toHaveLength(initialBlogs.length + 1);
-	expect(titles).toContain('Third blog post');
+	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
+	expect(titles).toContain('First class tests');
 });
 
 test('blog without likes property will default to the value 0', async () => {
 	const newBlog = {
-		title: 'Third blog post',
-		author: 'Crystal',
-		url: 'www.thirdblog.com',
+		title: 'First class tests',
+		author: 'Robert C. Martin',
+		url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
 	};
 
 	await api.post('/api/blogs').send(newBlog).expect(201);
@@ -81,20 +77,20 @@ test('blog without likes property will default to the value 0', async () => {
 	const isLikesZero = response.body[blogIndex].likes;
 	console.log(isLikesZero);
 
-	expect(response.body).toHaveLength(initialBlogs.length + 1);
+	expect(response.body).toHaveLength(helper.initialBlogs.length + 1);
 	expect(isLikesZero).toBe(0);
 });
 
 test('when title and/or url properties are missing status code 400 is returned', async () => {
 	const newBlog = {
-		title: 'Third blog post',
+		title: 'First class tests',
 	};
 
 	await api.post('/api/blogs').send(newBlog).expect(400);
 
-	const response = await api.get('/api/blogs');
+	const blogsAtEnd = await helper.blogsInDb();
 
-	expect(response.body).toHaveLength(initialBlogs.length);
+	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 });
 
 afterAll(() => {
