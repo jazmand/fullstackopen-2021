@@ -73,8 +73,8 @@ test('blog without likes property will default to the value 0', async () => {
 	await api.post('/api/blogs').send(newBlog).expect(201);
 
 	const response = await api.get('/api/blogs');
-	const blogIndex = response.body.length - 1;
-	const isLikesZero = response.body[blogIndex].likes;
+	const lastBlogIndex = response.body.length - 1;
+	const isLikesZero = response.body[lastBlogIndex].likes;
 	console.log(isLikesZero);
 
 	expect(response.body).toHaveLength(helper.initialBlogs.length + 1);
@@ -91,6 +91,20 @@ test('when title and/or url properties are missing status code 400 is returned',
 	const blogsAtEnd = await helper.blogsInDb();
 
 	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+});
+
+test('a blog can be deleted', async () => {
+	const blogsAtStart = await helper.blogsInDb();
+	const lastBlogIndex = blogsAtStart.length - 1;
+	const blogToDelete = blogsAtStart[lastBlogIndex];
+
+	await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+	const blogsAtEnd = await helper.blogsInDb();
+	const titles = blogsAtEnd.map((r) => r.title);
+
+	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+	expect(titles).not.toContain('Go To Statement Considered Harmful');
 });
 
 afterAll(() => {
