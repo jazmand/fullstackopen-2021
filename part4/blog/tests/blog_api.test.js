@@ -5,13 +5,31 @@ const app = require('../app');
 const api = supertest(app);
 
 const Blog = require('../models/blog');
+const User = require('../models/user');
+
+const userLogin = {
+	username: 'test',
+	password: 'password',
+};
 
 beforeEach(async () => {
 	await Blog.deleteMany({});
+	await Blog.insertMany(helper.initialBlogs);
+});
 
-	const blogObjects = helper.initialBlogs.map((blog) => new Blog(blog));
-	const promiseArray = blogObjects.map((blog) => blog.save());
-	await Promise.all(promiseArray);
+beforeAll(async () => {
+	await User.deleteMany({});
+	const user = {
+		username: 'test',
+		name: 'test user',
+		password: 'password',
+	};
+
+	await api
+		.post('/api/users')
+		.send(user)
+		.set('Accept', 'application/json')
+		.expect('Content-Type', /application\/json/);
 });
 
 describe('when there are initially some blogs saved', () => {
@@ -46,6 +64,11 @@ describe('checking if blogs adhere to certain naming specifications', () => {
 });
 describe('addition of a new blog', () => {
 	test('a valid blog can be added', async () => {
+		const loggedUser = await api
+			.post('/api/login')
+			.send(userLogin)
+			.expect('Content-Type', /application\/json/);
+
 		const newBlog = {
 			title: 'First class tests',
 			author: 'Robert C. Martin',
@@ -56,6 +79,7 @@ describe('addition of a new blog', () => {
 		await api
 			.post('/api/blogs')
 			.send(newBlog)
+			.set('Authorization', `bearer ${loggedUser.body.token}`)
 			.expect(201)
 			.expect('Content-Type', /application\/json/);
 
@@ -68,29 +92,43 @@ describe('addition of a new blog', () => {
 	});
 
 	test('blog without likes property will default to the value 0', async () => {
+		const loggedUser = await api
+			.post('/api/login')
+			.send(userLogin)
+			.expect('Content-Type', /application\/json/);
+
 		const newBlog = {
 			title: 'First class tests',
 			author: 'Robert C. Martin',
 			url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
 		};
 
-		await api.post('/api/blogs').send(newBlog).expect(201);
+		const response = await api
+			.post('/api/blogs')
+			.send(newBlog)
+			.set('Authorization', `bearer ${loggedUser.body.token}`)
+			.expect(201)
+			.expect('Content-Type', /application\/json/);
 
-		const response = await api.get('/api/blogs');
-		const lastBlogIndex = response.body.length - 1;
-		const isLikesZero = response.body[lastBlogIndex].likes;
-		console.log(isLikesZero);
-
-		expect(response.body).toHaveLength(helper.initialBlogs.length + 1);
-		expect(isLikesZero).toBe(0);
+		expect(response.body.likes).toBeDefined();
+		expect(response.body.likes).toBe(0);
 	});
 
 	test('when title and/or url properties are missing status code 400 is returned', async () => {
+		const loggedUser = await api
+			.post('/api/login')
+			.send(userLogin)
+			.expect('Content-Type', /application\/json/);
+
 		const newBlog = {
 			title: 'First class tests',
 		};
-
-		await api.post('/api/blogs').send(newBlog).expect(400);
+		await api
+			.post('/api/blogs')
+			.send(newBlog)
+			.set('Authorization', `bearer ${loggedUser.body.token}`)
+			.expect(400)
+			.expect('Content-Type', /application\/json/);
 
 		const blogsAtEnd = await helper.blogsInDb();
 
@@ -100,16 +138,38 @@ describe('addition of a new blog', () => {
 
 describe('deletion of a blog', () => {
 	test('a blog can be deleted', async () => {
-		const blogsAtStart = await helper.blogsInDb();
-		const lastBlogIndex = blogsAtStart.length - 1;
-		const blogToDelete = blogsAtStart[lastBlogIndex];
+		const loggedUser = await api
+			.post('/api/login')
+			.send(userLogin)
+			.expect('Content-Type', /application\/json/);
 
-		await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+		const newBlog = {
+			title: 'First class tests',
+			author: 'Robert C. Martin',
+			url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+			likes: 10,
+		};
+
+		await api
+			.post('/api/blogs')
+			.send(newBlog)
+			.set('Authorization', `bearer ${loggedUser.body.token}`)
+			.expect(201)
+			.expect('Content-Type', /application\/json/);
+
+		const blogsAtStart = await helper.blogsInDb();
+		const recentBlogIndex = blogsAtStart.length - 1;
+		const blogToDelete = blogsAtStart[recentBlogIndex];
+
+		await api
+			.delete(`/api/blogs/${blogToDelete.id}`)
+			.set('Authorization', `bearer ${loggedUser.body.token}`)
+			.expect(204);
 
 		const blogsAtEnd = await helper.blogsInDb();
 		const titles = blogsAtEnd.map((r) => r.title);
 
-		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 		expect(titles).not.toContain(blogToDelete.title);
 	});
 });
@@ -132,6 +192,23 @@ describe('updating a blog', () => {
 		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 		expect(updatedBlogLikes).toBe(10);
 	});
+});
+
+test('if a token is not provided', async () => {
+	const newBlog = {
+		title: 'First class tests',
+		author: 'Robert C. Martin',
+		url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+	};
+	await api
+		.post('/api/blogs')
+		.send(newBlog)
+		.expect(401)
+		.expect('Content-Type', /application\/json/);
+
+	const blogsAtEnd = await helper.blogsInDb();
+
+	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 });
 afterAll(() => {
 	mongoose.connection.close();
