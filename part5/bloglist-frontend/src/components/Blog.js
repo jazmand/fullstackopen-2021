@@ -1,7 +1,21 @@
 import React, {useState} from 'react';
 
-const Blog = ({blog, handleLikes}) => {
+const Blog = ({blog, handleLikes, handleRemove, user}) => {
 	const [showFull, setShowFull] = useState(false);
+
+	const removeButtonStyle = {
+		backgroundColor: 'cornflowerblue',
+	};
+
+	const showRemoveButton = () => {
+		return (
+			<div>
+				<button style={removeButtonStyle} onClick={() => handleRemove(blog)}>
+					remove
+				</button>
+			</div>
+		);
+	};
 
 	const showFullBlog = () => {
 		return (
@@ -12,6 +26,7 @@ const Blog = ({blog, handleLikes}) => {
 					<button onClick={() => handleLikes(blog.id, blog.likes)}>like</button>
 				</div>
 				<div>{blog.author}</div>
+				{blog['user'].username === user.username && showRemoveButton()}
 			</div>
 		);
 	};

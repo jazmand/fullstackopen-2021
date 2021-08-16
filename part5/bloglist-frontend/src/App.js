@@ -13,12 +13,12 @@ const App = () => {
 	const [password, setPassword] = useState('');
 	const [user, setUser] = useState(null);
 	const [message, setMessage] = useState(null);
-	const [likes, setLikes] = useState(null);
+	const [update, setUpdate] = useState(null);
 	const blogFormRef = useRef();
 
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
-	}, [likes]);
+	}, [update]);
 
 	useEffect(() => {
 		const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
@@ -95,7 +95,16 @@ const App = () => {
 			id: id,
 			likes: likes + 1,
 		});
-		setLikes(likes);
+		setUpdate(likes);
+	};
+
+	const handleRemove = async (blog) => {
+		const result = window.confirm(`Remove ${blog.title} by ${blog.author}?`);
+		result &&
+			(await blogService.remove({
+				id: blog.id,
+			}));
+		setUpdate(blogs);
 	};
 
 	if (user === null) {
@@ -131,7 +140,13 @@ const App = () => {
 			</Togglable>
 			{blogs.sort((a, b) => (a.likes >= b.likes ? -1 : 1)) &&
 				blogs.map((blog) => (
-					<Blog key={blog.id} blog={blog} handleLikes={handleLikes} />
+					<Blog
+						key={blog.id}
+						blog={blog}
+						handleLikes={handleLikes}
+						handleRemove={handleRemove}
+						user={user}
+					/>
 				))}
 		</div>
 	);
