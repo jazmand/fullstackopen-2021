@@ -26,10 +26,12 @@ const Blog = ({blog}) => {
 
 	return (
 		<div style={blogStyle}>
-			{blog.title}
-			<button onClick={() => setShowFull(!showFull)}>
-				{showFull ? 'hide' : 'view'}
-			</button>
+			<div>
+				{blog.title}
+				<button onClick={() => setShowFull(!showFull)}>
+					{showFull ? 'hide' : 'view'}
+				</button>
+			</div>
 			{showFull && showFullBlog()}
 		</div>
 	);
