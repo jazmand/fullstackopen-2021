@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-const Blog = ({blog}) => {
+const Blog = ({blog, handleLikes}) => {
 	const [showFull, setShowFull] = useState(false);
 
 	const showFullBlog = () => {
@@ -9,7 +9,7 @@ const Blog = ({blog}) => {
 				<div>{blog.url}</div>
 				<div>
 					{`likes ${blog.likes}`}
-					<button>like</button>
+					<button onClick={() => handleLikes(blog.id, blog.likes)}>like</button>
 				</div>
 				<div>{blog.author}</div>
 			</div>

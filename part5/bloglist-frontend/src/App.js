@@ -13,11 +13,12 @@ const App = () => {
 	const [password, setPassword] = useState('');
 	const [user, setUser] = useState(null);
 	const [message, setMessage] = useState(null);
+	const [likes, setLikes] = useState(null);
 	const blogFormRef = useRef();
 
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
-	}, []);
+	}, [likes]);
 
 	useEffect(() => {
 		const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
@@ -89,6 +90,14 @@ const App = () => {
 		}
 	};
 
+	const handleLikes = async (id, likes) => {
+		await blogService.update({
+			id: id,
+			likes: likes + 1,
+		});
+		setLikes(likes);
+	};
+
 	if (user === null) {
 		return (
 			<div>
@@ -121,7 +130,7 @@ const App = () => {
 				<BlogForm createBlog={addBlog} />
 			</Togglable>
 			{blogs.map((blog) => (
-				<Blog key={blog.id} blog={blog} />
+				<Blog key={blog.id} blog={blog} handleLikes={handleLikes} />
 			))}
 		</div>
 	);
