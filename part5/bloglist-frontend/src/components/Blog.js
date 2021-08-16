@@ -1,7 +1,21 @@
-import React from 'react';
-import Togglable from './Togglable';
+import React, {useState} from 'react';
 
 const Blog = ({blog}) => {
+	const [showFull, setShowFull] = useState(false);
+
+	const showFullBlog = () => {
+		return (
+			<div>
+				<div>{blog.url}</div>
+				<div>
+					{`likes ${blog.likes}`}
+					<button>like</button>
+				</div>
+				<div>{blog.author}</div>
+			</div>
+		);
+	};
+
 	const blogStyle = {
 		paddingTop: '10px',
 		paddingLeft: '2px',
@@ -9,16 +23,14 @@ const Blog = ({blog}) => {
 		borderWidth: '1px',
 		marginBottom: '5px',
 	};
+
 	return (
 		<div style={blogStyle}>
 			{blog.title}
-			<Togglable buttonLabel='view'>
-				<div>{blog.url}</div>
-				<div>
-					{`likes ${blog.likes}`} <button>like</button>
-				</div>
-				<div>{blog.author}</div>
-			</Togglable>
+			<button onClick={() => setShowFull(!showFull)}>
+				{showFull ? 'hide' : 'view'}
+			</button>
+			{showFull && showFullBlog()}
 		</div>
 	);
 };
