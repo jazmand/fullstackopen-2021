@@ -72,6 +72,7 @@ const App = () => {
 			blogFormRef.current.toggleVisibility();
 			const response = await blogService.create(blogObject);
 			setBlogs(blogs.concat(response));
+			setUpdate(blogs);
 			setMessage({
 				text: `a new blog ${blogObject.title} by ${blogObject.author} added`,
 				type: 'fulfilled',
@@ -138,7 +139,7 @@ const App = () => {
 			<Togglable buttonLabel='new blog' ref={blogFormRef}>
 				<BlogForm createBlog={addBlog} />
 			</Togglable>
-			{blogs.sort((a, b) => (a.likes >= b.likes ? -1 : 1)) &&
+			{blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1)) &&
 				blogs.map((blog) => (
 					<Blog
 						key={blog.id}
