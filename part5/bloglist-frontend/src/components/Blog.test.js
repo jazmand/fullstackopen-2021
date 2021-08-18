@@ -1,18 +1,44 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {render} from '@testing-library/react';
+import {render, fireEvent} from '@testing-library/react';
 import Blog from './Blog';
 
-test("component displaying a blog renders the blog's title and author", () => {
+describe('<Blog />', () => {
+	let component;
 	const sampleBlog = {
 		title: 'Component testing is done with react-testing-library',
 		author: 'Harry Potter',
+		url: 'www.harrypotter.com',
+		likes: 0,
+		user: {
+			username: 'test',
+			name: 'test test',
+		},
 	};
 
-	const component = render(<Blog blog={sampleBlog} />);
+	const sampleUser = {
+		username: 'test',
+		name: 'test test',
+	};
 
-	component.debug();
+	beforeEach(() => {
+		component = render(<Blog blog={sampleBlog} user={sampleUser} />);
+	});
 
-	expect(component.container).toHaveTextContent(sampleBlog.title);
-	expect(component.container).toHaveTextContent(sampleBlog.author);
+	test("component displaying a blog renders the blog's title and author", () => {
+		// component.debug();
+
+		expect(component.container).toHaveTextContent(sampleBlog.title);
+		expect(component.container).toHaveTextContent(sampleBlog.author);
+		expect(component.container).not.toHaveTextContent(sampleBlog.likes);
+		expect(component.container).not.toHaveTextContent(sampleBlog.url);
+	});
+
+	test("blog's url and number of likes are shown when the button controlling the shown details has been clicked", () => {
+		const button = component.getByText('view');
+		fireEvent.click(button);
+
+		expect(component.container).toHaveTextContent(sampleBlog.url);
+		expect(component.container).toHaveTextContent(sampleBlog.likes);
+	});
 });
