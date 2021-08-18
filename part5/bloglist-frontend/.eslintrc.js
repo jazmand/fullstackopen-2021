@@ -18,6 +18,7 @@ module.exports = {
 		indent: ['error', 'tab'],
 		'linebreak-style': ['error', 'windows'],
 		quotes: ['error', 'single'],
+		avoidEscape: ['single', {avoidEscape: true}],
 		semi: ['error', 'always'],
 		eqeqeq: 'error',
 		'no-trailing-spaces': 'error',

@@ -25,7 +25,7 @@ const Blog = ({blog, handleLikes, handleRemove, user}) => {
 					{`likes ${blog.likes}`}
 					<button onClick={() => handleLikes(blog.id, blog.likes)}>like</button>
 				</div>
-				<div>{blog.author}</div>
+				<div>{blog['user'].name}</div>
 				{blog['user'].username === user.username && showRemoveButton()}
 			</div>
 		);
@@ -42,7 +42,7 @@ const Blog = ({blog, handleLikes, handleRemove, user}) => {
 	return (
 		<div style={blogStyle}>
 			<div>
-				{blog.title}
+				<b>{blog.title}</b> {blog.author}
 				<button onClick={() => setShowFull(!showFull)}>
 					{showFull ? 'hide' : 'view'}
 				</button>
