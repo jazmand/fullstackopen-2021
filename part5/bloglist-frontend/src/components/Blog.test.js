@@ -21,8 +21,12 @@ describe('<Blog />', () => {
 		name: 'test test',
 	};
 
+	let mockHandler = jest.fn();
+
 	beforeEach(() => {
-		component = render(<Blog blog={sampleBlog} user={sampleUser} />);
+		component = render(
+			<Blog blog={sampleBlog} user={sampleUser} handleLikes={mockHandler} />
+		);
 	});
 
 	test("component displaying a blog renders the blog's title and author", () => {
@@ -40,5 +44,16 @@ describe('<Blog />', () => {
 
 		expect(component.container).toHaveTextContent(sampleBlog.url);
 		expect(component.container).toHaveTextContent(sampleBlog.likes);
+	});
+
+	test('like button is clicked twice', () => {
+		const viewButton = component.getByText('view');
+		fireEvent.click(viewButton);
+
+		const likeButton = component.getByText('like');
+		fireEvent.click(likeButton);
+		fireEvent.click(likeButton);
+
+		expect(mockHandler.mock.calls).toHaveLength(2);
 	});
 });
