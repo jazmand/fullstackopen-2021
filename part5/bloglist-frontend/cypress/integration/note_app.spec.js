@@ -46,7 +46,11 @@ describe('Blog app', function () {
 
 	describe('When logged in', function () {
 		beforeEach(function () {
-			cy.login({username: 'mluukkai', password: 'salainen'});
+			cy.login({
+				name: 'Matti Luukkainen',
+				username: 'mluukkai',
+				password: 'salainen',
+			});
 		});
 
 		it('A blog can be created', function () {
@@ -72,6 +76,29 @@ describe('Blog app', function () {
 				cy.contains('view').click();
 				cy.contains('like').click();
 				cy.contains('likes 1');
+			});
+
+			it('it can be deleted', function () {
+				cy.contains('view').click();
+				cy.contains('remove').click();
+				cy.get('html').should('not.contain', 'This is a blog title');
+			});
+
+			it.only('it can be deleted', function () {
+				const user = {
+					name: 'Other User',
+					username: 'otherUser',
+					password: 'salainen',
+				};
+				cy.request('POST', 'http://localhost:3003/api/users/', user);
+				cy.login({
+					username: 'otherUser',
+					password: 'salainen',
+				});
+				cy.contains('view').click();
+				cy.should('not.contain', 'remove').parent().find('button');
+				cy.contains('This is a blog title');
+				cy.contains('AuthorFirst AuthorLast');
 			});
 		});
 	});
