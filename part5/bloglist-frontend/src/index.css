@@ -8,9 +8,9 @@
 }
 
 .message-fulfilled {
-	color: green;
+	color: rgb(0, 128, 0);
 }
 
 .message-error {
-	color: red;
+	color: rgb(255, 0, 0);
 }
