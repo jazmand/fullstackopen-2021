@@ -78,13 +78,13 @@ describe('Blog app', function () {
 				cy.contains('likes 1');
 			});
 
-			it('it can be deleted', function () {
+			it('it can be deleted by the appropriate user', function () {
 				cy.contains('view').click();
 				cy.contains('remove').click();
 				cy.get('html').should('not.contain', 'This is a blog title');
 			});
 
-			it.only('it can be deleted', function () {
+			it("it can't be deleted by a different user", function () {
 				const user = {
 					name: 'Other User',
 					username: 'otherUser',
@@ -99,6 +99,54 @@ describe('Blog app', function () {
 				cy.should('not.contain', 'remove').parent().find('button');
 				cy.contains('This is a blog title');
 				cy.contains('AuthorFirst AuthorLast');
+			});
+		});
+
+		describe('and multiple blogs exist', function () {
+			beforeEach(function () {
+				cy.createBlog({
+					title: 'This is a blog title',
+					author: 'AuthorFirst AuthorLast',
+					url: 'www.thisisaurl.com',
+					likes: 3,
+				});
+				cy.createBlog({
+					title: 'This is a second blog title',
+					author: 'AuthorFirst AuthorLast',
+					url: 'www.thisisaurl.com/2',
+					likes: 9,
+				});
+				cy.createBlog({
+					title: 'This is a third blog title',
+					author: 'AuthorFirst AuthorLast',
+					url: 'www.thisisaurl.com/3',
+				});
+				cy.createBlog({
+					title: 'This is a fourth blog title',
+					author: 'AuthorFirst AuthorLast',
+					url: 'www.thisisaurl.com/4',
+					likes: 6,
+				});
+			});
+
+			it('blogs are ordered in descending order of likes', function () {
+				cy.contains('view').click();
+				cy.contains('likes 9');
+				cy.should('not.contain', 'likes 6');
+				cy.should('not.contain', 'likes 3');
+				cy.should('not.contain', 'likes 0');
+
+				cy.contains('view').click();
+				cy.contains('likes 6');
+				cy.should('not.contain', 'likes 3');
+				cy.should('not.contain', 'likes 0');
+
+				cy.contains('view').click();
+				cy.contains('likes 3');
+				cy.should('not.contain', 'likes 0');
+
+				cy.contains('view').click();
+				cy.contains('likes 0');
 			});
 		});
 	});
