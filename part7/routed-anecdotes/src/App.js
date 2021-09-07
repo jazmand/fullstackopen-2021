@@ -1,11 +1,5 @@
 import React, {useState} from 'react';
-import {
-	BrowserRouter as Router,
-	Switch,
-	Route,
-	Link,
-	useParams,
-} from 'react-router-dom';
+import {Switch, Route, Link, useParams, useHistory} from 'react-router-dom';
 
 const Menu = () => {
 	const padding = {
@@ -141,6 +135,8 @@ const CreateNew = (props) => {
 };
 
 const App = () => {
+	const history = useHistory();
+
 	const [anecdotes, setAnecdotes] = useState([
 		{
 			content: 'If it hurts, do it more often',
@@ -163,6 +159,9 @@ const App = () => {
 	const addNew = (anecdote) => {
 		anecdote.id = (Math.random() * 10000).toFixed(0);
 		setAnecdotes(anecdotes.concat(anecdote));
+		setNotification(`a new anecdote ${anecdote.content} created!`);
+		history.push('/');
+		setTimeout(() => setNotification(''), 10000);
 	};
 
 	const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
@@ -181,24 +180,23 @@ const App = () => {
 	return (
 		<div>
 			<h1>Software anecdotes</h1>
-			<Router>
-				<Menu />
-				<Switch>
-					<Route path='/anecdotes/:id'>
-						<Anecdote anecdotes={anecdotes} />
-					</Route>
-					<Route path='/create'>
-						<CreateNew addNew={addNew} />
-					</Route>
-					<Route path='/about'>
-						<About />
-					</Route>
-					<Route path='/'>
-						<AnecdoteList anecdotes={anecdotes} />
-					</Route>
-				</Switch>
-				<Footer />
-			</Router>
+			<Menu />
+			{notification}
+			<Switch>
+				<Route path='/anecdotes/:id'>
+					<Anecdote anecdotes={anecdotes} />
+				</Route>
+				<Route path='/create'>
+					<CreateNew addNew={addNew} />
+				</Route>
+				<Route path='/about'>
+					<About />
+				</Route>
+				<Route path='/'>
+					<AnecdoteList anecdotes={anecdotes} />
+				</Route>
+			</Switch>
+			<Footer />
 		</div>
 	);
 };
