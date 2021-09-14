@@ -1,4 +1,11 @@
 import React, {useState, useEffect, useRef} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+
+import {
+	setFulfilledMessage,
+	setErrorMessage,
+} from './reducers/notificationReducer';
+
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import loginService from './services/login';
@@ -12,8 +19,10 @@ const App = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [user, setUser] = useState(null);
-	const [message, setMessage] = useState(null);
 	const [update, setUpdate] = useState(null);
+
+	const dispatch = useDispatch();
+	const message = useSelector((state) => state.notification);
 	const blogFormRef = useRef();
 
 	useEffect(() => {
@@ -42,21 +51,9 @@ const App = () => {
 			setUser(user);
 			setUsername('');
 			setPassword('');
-			setMessage({
-				text: 'Successfully logged in',
-				type: 'fulfilled',
-			});
-			setTimeout(() => {
-				setMessage(null);
-			}, 5000);
+			dispatch(setFulfilledMessage('Successfully logged in'));
 		} catch (exception) {
-			setMessage({
-				text: 'wrong username or password',
-				type: 'error',
-			});
-			setTimeout(() => {
-				setMessage(null);
-			}, 5000);
+			setErrorMessage('Wrong username or password');
 		}
 	};
 
@@ -73,21 +70,13 @@ const App = () => {
 			const response = await blogService.create(blogObject);
 			setBlogs(blogs.concat(response));
 			setUpdate(blogs);
-			setMessage({
-				text: `a new blog ${blogObject.title} by ${blogObject.author} added`,
-				type: 'fulfilled',
-			});
-			setTimeout(() => {
-				setMessage(null);
-			}, 5000);
+			dispatch(
+				setFulfilledMessage(
+					`a new blog ${blogObject.title} by ${blogObject.author} added`
+				)
+			);
 		} catch (exception) {
-			setMessage({
-				text: `${exception}`,
-				type: 'error',
-			});
-			setTimeout(() => {
-				setMessage(null);
-			}, 5000);
+			setErrorMessage(`${exception}`);
 		}
 	};
 
