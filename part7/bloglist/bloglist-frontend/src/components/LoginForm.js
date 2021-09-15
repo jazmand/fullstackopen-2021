@@ -1,50 +1,64 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, {useState} from 'react';
+import {useDispatch} from 'react-redux';
+import {userLogin} from '../reducers/userReducer';
 
-const LoginForm = ({
-	handleSubmit,
-	handleUsernameChange,
-	handlePasswordChange,
-	username,
-	password,
-}) => {
+import {makeStyles} from '@material-ui/core/styles';
+import {TextField, Button} from '@material-ui/core';
+
+const LoginForm = () => {
+	const dispatch = useDispatch();
+	const [username, setUsername] = useState('');
+	const [password, setPassword] = useState('');
+
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		dispatch(userLogin(username, password));
+		setUsername('');
+		setPassword('');
+	};
+
+	const useStyles = makeStyles((theme) => ({
+		root: {
+			'& > *': {
+				margin: theme.spacing(1),
+			},
+		},
+	}));
+	const classes = useStyles();
+
 	return (
 		<div>
-			<form onSubmit={handleSubmit}>
+			<form onSubmit={handleSubmit} className={classes.root}>
 				<div>
-					username
-					<input
-						type='text'
-						value={username}
-						name='Username'
-						onChange={handleUsernameChange}
+					<TextField
+						label='Username'
+						variant='outlined'
 						id='username'
+						value={username}
+						onChange={({target}) => setUsername(target.value)}
 					/>
 				</div>
 				<div>
-					password
-					<input
+					<TextField
+						label='Password'
+						variant='outlined'
+						id='password'
 						type='password'
 						value={password}
-						name='Password'
-						onChange={handlePasswordChange}
-						id='password'
+						onChange={({target}) => setPassword(target.value)}
 					/>
 				</div>
-				<button id='login-button' type='submit'>
-					login
-				</button>
+				<Button
+					id='login-button'
+					type='submit'
+					variant='contained'
+					color='primary'
+				>
+					Login
+				</Button>
 			</form>
 		</div>
 	);
-};
-
-LoginForm.propTypes = {
-	handleSubmit: PropTypes.func.isRequired,
-	handleUsernameChange: PropTypes.func.isRequired,
-	handlePasswordChange: PropTypes.func.isRequired,
-	username: PropTypes.string.isRequired,
-	password: PropTypes.string.isRequired,
 };
 
 export default LoginForm;

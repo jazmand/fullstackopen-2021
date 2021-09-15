@@ -1,5 +1,6 @@
 import axios from 'axios';
 const baseUrl = '/api/blogs';
+import decode from 'jwt-decode';
 
 let token = null;
 
@@ -39,4 +40,31 @@ const remove = async (blog) => {
 	await axios.delete(`${baseUrl}/${blog.id}`, config);
 };
 
-export default {setToken, getAll, create, update, remove};
+const getUserInfo = () => {
+	return token ? decode(token) : false;
+};
+
+const getAllUsers = () => {
+	const config = {
+		headers: {Authorization: token},
+	};
+
+	const request = axios.get('/api/users', config);
+	return request.then((response) => response.data);
+};
+
+const newComment = async (id, comment) => {
+	const request = await axios.post(`${baseUrl}/${id}/comments`, {comment});
+	return request.data;
+};
+
+export default {
+	setToken,
+	getAll,
+	create,
+	update,
+	remove,
+	getAllUsers,
+	getUserInfo,
+	newComment,
+};

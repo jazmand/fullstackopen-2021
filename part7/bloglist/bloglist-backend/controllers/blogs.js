@@ -4,7 +4,16 @@ const Blog = require('../models/blog');
 blogsRouter.get('/', async (request, response) => {
 	const blogs = await Blog.find({}).populate('user', {username: 1, name: 1});
 
-	response.json(blogs);
+	response.json(blogs.map((blog) => blog.toJSON()));
+});
+
+blogsRouter.get('/:id', async (request, response) => {
+	const blog = await Blog.findById(request.params.id);
+	if (blog) {
+		response.json(blog);
+	} else {
+		response.status(404).end();
+	}
 });
 
 blogsRouter.post('/', async (request, response, next) => {
@@ -46,15 +55,22 @@ blogsRouter.delete('/:id', async (request, response, next) => {
 	response.status(204).end();
 });
 
-blogsRouter.put('/:id', async (request, response, next) => {
-	const body = request.body;
-	const blog = {likes: body.likes};
+blogsRouter.put('/:id', async (request, response) => {
+	const id = request.params.id;
+	const blog = {likes: request.body.likes};
 
-	const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+	const updatedBlog = await Blog.findByIdAndUpdate(id, blog, {
 		new: true,
 	});
 	response.json(updatedBlog);
 	response.status(200).end();
+});
+
+blogsRouter.post('/:id/comments', async (request, response) => {
+	const currentBlog = await Blog.findById(request.params.id);
+	currentBlog.comments = currentBlog.comments.concat(request.body.comment);
+	currentBlog.save();
+	response.status(200).json(currentBlog);
 });
 
 module.exports = blogsRouter;
