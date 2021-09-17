@@ -1,4 +1,5 @@
 import React from 'react';
+import {Typography} from '@material-ui/core';
 
 const Notification = ({message}) => {
 	if (message === null) {
@@ -6,7 +7,9 @@ const Notification = ({message}) => {
 	}
 
 	return (
-		<div className={`message message-${message.type}`}>{message.text}</div>
+		<Typography className={`message message-${message.type}`}>
+			{message.text}
+		</Typography>
 	);
 };
 

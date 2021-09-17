@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 
+import {makeStyles} from '@material-ui/core/styles';
+import {TextField, Button} from '@material-ui/core';
+
 const BlogForm = ({createBlog}) => {
 	const [title, setTitle] = useState('');
 	const [author, setAuthor] = useState('');
@@ -17,12 +20,22 @@ const BlogForm = ({createBlog}) => {
 		setUrl('');
 	};
 
+	const useStyles = makeStyles((theme) => ({
+		root: {
+			'& > *': {
+				margin: theme.spacing(1),
+			},
+		},
+	}));
+	const classes = useStyles();
+
 	return (
 		<div className='blogFormDiv'>
-			<form onSubmit={handleCreateBlog}>
+			<form onSubmit={handleCreateBlog} className={classes.root}>
 				<div>
-					title:
-					<input
+					<TextField
+						label='Title'
+						variant='outlined'
 						id='title'
 						value={title}
 						name='title'
@@ -30,8 +43,9 @@ const BlogForm = ({createBlog}) => {
 					/>
 				</div>
 				<div>
-					author:
-					<input
+					<TextField
+						label='Author'
+						variant='outlined'
 						id='author'
 						value={author}
 						name='author'
@@ -39,17 +53,23 @@ const BlogForm = ({createBlog}) => {
 					/>
 				</div>
 				<div>
-					url:
-					<input
+					<TextField
+						label='Url'
+						variant='outlined'
 						id='url'
 						value={url}
 						name='url'
 						onChange={({target}) => setUrl(target.value)}
 					/>
 				</div>
-				<button id='create-blog' type='submit'>
+				<Button
+					id='create-blog'
+					type='submit'
+					variant='contained'
+					color='primary'
+				>
 					Create
-				</button>
+				</Button>
 			</form>
 		</div>
 	);

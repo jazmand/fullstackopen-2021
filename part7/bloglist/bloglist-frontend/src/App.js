@@ -45,12 +45,6 @@ const App = () => {
 		dispatch(createBlog(blogObject));
 	};
 
-	const blogForm = () => (
-		<Togglable buttonLabel='Create Blog' ref={blogFormRef}>
-			<BlogForm createBlog={addBlog} />
-		</Togglable>
-	);
-
 	const matchUserId = useRouteMatch('/users/:id');
 	const userBlogs = matchUserId
 		? blogs.filter((blog) => blog.user.id === matchUserId.params.id)
@@ -107,7 +101,9 @@ const App = () => {
 					) : (
 						<div>
 							<h2>Blogs</h2>
-							{blogForm()}
+							<Togglable buttonLabel='Create Blog' ref={blogFormRef}>
+								<BlogForm createBlog={addBlog} />
+							</Togglable>
 							<TableContainer component={Paper}>
 								<Table className={classes.table} aria-label='customized table'>
 									<TableBody>

@@ -1,16 +1,16 @@
 .message {
-	background: lightgrey;
 	font-size: 20px;
-	border-style: solid;
+	border: 2px solid;
 	border-radius: 5px;
 	padding: 10px;
 	margin-bottom: 10px;
+	color: black;
 }
 
 .message-fulfilled {
-	color: rgb(0, 128, 0);
+	background: rgba(94, 202, 94, 0.705);
 }
 
 .message-error {
-	color: rgb(255, 0, 0);
+	background: rgba(253, 68, 68, 0.678);
 }

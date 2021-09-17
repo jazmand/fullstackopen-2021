@@ -8,6 +8,9 @@ import {
 } from '../reducers/notificationReducer';
 import blogService from '../services/blogs';
 
+import {TextField, Button, Typography, Link} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
+
 const Blog = ({blog}) => {
 	if (!blog) return <p>Loading...</p>;
 
@@ -53,18 +56,34 @@ const Blog = ({blog}) => {
 		e.target.comment.value = '';
 	};
 
+	const useStyles = makeStyles((theme) => ({
+		root: {
+			'& > *': {
+				margin: theme.spacing(1),
+			},
+		},
+	}));
+	const classes = useStyles();
+
 	return (
 		<div>
 			<h1 className='title'>{blog.title}</h1>
 			<div className='info'>
-				<a href={blog.id}>{blog.url}</a>
-				<p>
+				<Link href={blog.id} underline='hover' variant='h6'>
+					{blog.url}
+				</Link>
+				<Typography variant='h5' className={classes.root}>
 					<span className='likes'>{blog.likes} likes</span>
-					<button className='like' onClick={addLike}>
-						like
-					</button>
-				</p>
-				<p className='author'>added by {blog.author}</p>
+					<Button
+						className='like'
+						onClick={addLike}
+						variant='contained'
+						color='primary'
+					>
+						Like
+					</Button>
+				</Typography>
+				<Typography className='author'>added by {blog.author}</Typography>
 				{allowRemove && (
 					<button className='remove' onClick={removeBlog}>
 						remove
@@ -73,9 +92,18 @@ const Blog = ({blog}) => {
 			</div>
 			<div className='comments'>
 				<h3>Comments</h3>
-				<form onSubmit={createComment}>
-					<input type='text' name='comment' />
-					<button type='submit'>add comment</button>
+				<form onSubmit={createComment} className={classes.root}>
+					<TextField
+						label='Add Comment'
+						variant='outlined'
+						type='text'
+						name='comment'
+					/>
+					<div>
+						<Button type='submit' variant='contained' color='primary'>
+							Submit
+						</Button>
+					</div>
 				</form>
 				<ul>
 					{blog.comments ? (
